@@ -3,30 +3,35 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CsvView {
 
-    public void processCsv() {
+    public Map<String, List<String>> processCsv() {
         String path = getClass().getClassLoader().getResource("lens-export_5.csv").getPath();
-        List<String> processedLines = new ArrayList<>();
+        Map<String, List<String>> dataMap = new HashMap<>();
+        List<String> applicantsList = new ArrayList<>();
+        List<String> inventorsList = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
+            br.readLine(); // Skip header if necessary
             while ((line = br.readLine()) != null) {
                 String[] columns = line.split(";");
-                // Kontrollera att arrayen har minst 2 kolumner
-                if (columns.length > 1) {
-                    columns[0] = columns[0].replace(";", ",");
-                    columns[1] = columns[1].replace(";", ",");
+                if (columns.length > 6) {
+                    applicantsList.add(columns[5].replace(";", ","));
+                    inventorsList.add(columns[6].replace(";", ","));
                 }
-                processedLines.add(String.join(",", columns));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Skriv ut eller spara de bearbetade raderna
-        processedLines.forEach(System.out::println);
+        dataMap.put("Applicants", applicantsList);
+        dataMap.put("Inventors", inventorsList);
+        return dataMap;
     }
 }
+
