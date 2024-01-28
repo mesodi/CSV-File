@@ -9,8 +9,5 @@ public class CsvFileApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CsvFileApplication.class, args);
-		CsvView csvView = new CsvView();
-		csvView.processCsv();
 	}
-
 }

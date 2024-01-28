@@ -1,5 +1,10 @@
 package CSV;
-import java.io.BufferedReader;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.Reader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,22 +14,22 @@ import java.util.Map;
 
 public class CsvView {
 
-    public Map<String, List<String>> processCsv() {
-        String path = getClass().getClassLoader().getResource("lens-export_5.csv").getPath();
+    public Map<String, List<String>> processCsv(String filePath) {
         Map<String, List<String>> dataMap = new HashMap<>();
         List<String> applicantsList = new ArrayList<>();
         List<String> inventorsList = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String line;
-            br.readLine(); // Skip header if necessary
-            while ((line = br.readLine()) != null) {
-                String[] columns = line.split(";");
-                if (columns.length > 6) {
-                    applicantsList.add(columns[5].replace(";", ","));
-                    inventorsList.add(columns[6].replace(";", ","));
-                }
+        try (Reader reader = new FileReader(filePath);
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+
+            for (CSVRecord csvRecord : csvParser) {
+                String applicants = csvRecord.get("Applicants").replace(";", ", ");
+                String inventors = csvRecord.get("Inventors").replace(";", ", ");
+
+                applicantsList.add(applicants);
+                inventorsList.add(inventors);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,5 +38,6 @@ public class CsvView {
         dataMap.put("Inventors", inventorsList);
         return dataMap;
     }
-}
 
+
+}
