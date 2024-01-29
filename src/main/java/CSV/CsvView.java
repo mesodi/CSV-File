@@ -3,7 +3,7 @@ package CSV;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
+import org.springframework.stereotype.Component;
 import java.io.Reader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class CsvView {
 
     public Map<String, List<String>> processCsv(String filePath) {
@@ -38,6 +39,4 @@ public class CsvView {
         dataMap.put("Inventors", inventorsList);
         return dataMap;
     }
-
-
 }

@@ -1,10 +1,11 @@
 package CSVFileFilteringProcess.CSVFile;
 
-import CSV.CsvView;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan({"CSVFileFilteringProcess.CSVFile", "CSV"})
 public class CsvFileApplication {
 
 	public static void main(String[] args) {
