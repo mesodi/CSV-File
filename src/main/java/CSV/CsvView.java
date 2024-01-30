@@ -15,28 +15,35 @@ import java.util.Map;
 @Component
 public class CsvView {
 
-    public Map<String, List<String>> processCsv(String filePath) {
+    private static final List<String> EXPECTED_HEADERS = List.of(
+            "Publication year",
+            "Application Number",
+            "Title",
+            "Inventors",
+            "CPC",
+            "Applicants" // Lägg till "Applicants" i listan över förväntade headers
+    );
+
+    public Map<String, List<String>> processCsv(String filePath) throws IOException {
         Map<String, List<String>> dataMap = new HashMap<>();
-        List<String> applicantsList = new ArrayList<>();
-        List<String> inventorsList = new ArrayList<>();
 
-        try (Reader reader = new FileReader(filePath);
-             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+        try (Reader reader = new FileReader(filePath)) {
+            CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT
+                    .withFirstRecordAsHeader()
+                    .withIgnoreHeaderCase()
+                    .withTrim());
 
-            for (CSVRecord csvRecord : csvParser) {
-                String applicants = csvRecord.get("Applicants").replace(";", ", ");
-                String inventors = csvRecord.get("Inventors").replace(";", ", ");
+            // Initialize lists for expected columns
+            EXPECTED_HEADERS.forEach(header -> dataMap.put(header, new ArrayList<>()));
 
-                applicantsList.add(applicants);
-                inventorsList.add(inventors);
+            for (CSVRecord record : parser) {
+                for (String header : EXPECTED_HEADERS) {
+                    String value = record.isSet(header) ? record.get(header) : "N/A"; // Default to "N/A" if the column is missing
+                    dataMap.get(header).add(value);
+                }
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        dataMap.put("Applicants", applicantsList);
-        dataMap.put("Inventors", inventorsList);
         return dataMap;
     }
 }
