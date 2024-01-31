@@ -25,8 +25,8 @@ public class CsvView {
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
             for (CSVRecord csvRecord : csvParser) {
-                String applicants = csvRecord.get("Applicants").replace(";", ", ");
-                String inventors = csvRecord.get("Inventors").replace(";", ", ");
+                String applicants = csvRecord.get("Applicants");
+                String inventors = csvRecord.get("Inventors");
 
                 applicantsList.add(applicants);
                 inventorsList.add(inventors);
