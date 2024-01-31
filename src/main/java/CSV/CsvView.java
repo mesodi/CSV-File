@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
+
 import java.io.Reader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,35 +16,40 @@ import java.util.Map;
 @Component
 public class CsvView {
 
-    private static final List<String> EXPECTED_HEADERS = List.of(
-            "Publication year",
-            "Application Number",
-            "Title",
-            "Inventors",
-            "CPC",
-            "Applicants" // Lägg till "Applicants" i listan över förväntade headers
-    );
-
-    public Map<String, List<String>> processCsv(String filePath) throws IOException {
+    public Map<String, List<String>> processCsv(String filePath) {
         Map<String, List<String>> dataMap = new HashMap<>();
+        List<String> applicantsList = new ArrayList<>();
+        List<String> inventorsList = new ArrayList<>();
 
-        try (Reader reader = new FileReader(filePath)) {
-            CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT
-                    .withFirstRecordAsHeader()
-                    .withIgnoreHeaderCase()
-                    .withTrim());
+        try (Reader reader = new FileReader(filePath);
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
-            // Initialize lists for expected columns
-            EXPECTED_HEADERS.forEach(header -> dataMap.put(header, new ArrayList<>()));
+            for (CSVRecord csvRecord : csvParser) {
+                String applicants = csvRecord.get("Applicants").replace(";", ", ");
+                String inventors = csvRecord.get("Inventors").replace(";", ", ");
 
-            for (CSVRecord record : parser) {
-                for (String header : EXPECTED_HEADERS) {
-                    String value = record.isSet(header) ? record.get(header) : "N/A"; // Default to "N/A" if the column is missing
-                    dataMap.get(header).add(value);
-                }
+                applicantsList.add(applicants);
+                inventorsList.add(inventors);
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+        dataMap.put("Applicants", applicantsList);
+        dataMap.put("Inventors", inventorsList);
         return dataMap;
+    }
+
+    public List<String> searchInCsv(String searchTerm, Map<String, List<String>> data) {
+        List<String> searchResults = new ArrayList<>();
+        data.forEach((key, values) -> {
+            for (String value : values) {
+                if (value.toLowerCase().contains(searchTerm.toLowerCase())) {
+                    searchResults.add(value);
+                }
+            }
+        });
+        return searchResults;
     }
 }
