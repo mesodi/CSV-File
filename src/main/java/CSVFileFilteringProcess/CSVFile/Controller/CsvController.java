@@ -17,7 +17,7 @@ public class CsvController {
 
         // Antag att vi har 5 filer att bearbeta
         for (int i = 1; i <= 5; i++) {
-            String filePath = "src/main/resources/lens-export1.csv";
+            String filePath = "src/main/resources/lens-expor.csv";
             Map<String, List<String>> data = csvView.processCsv(filePath);
 
             // Bygg HTML för varje fil
