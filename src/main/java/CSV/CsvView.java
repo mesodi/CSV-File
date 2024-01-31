@@ -5,9 +5,9 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +17,10 @@ import java.util.Map;
 public class CsvView {
 
     public Map<String, List<String>> processCsv(String filePath) {
+        return processCsv(filePath, null); // Anropa den andra versionen av metoden utan sökterm
+    }
+
+    public Map<String, List<String>> processCsv(String filePath, String searchTerm) {
         Map<String, List<String>> dataMap = new HashMap<>();
         List<String> applicantsList = new ArrayList<>();
         List<String> inventorsList = new ArrayList<>();
@@ -28,8 +32,11 @@ public class CsvView {
                 String applicants = csvRecord.get("Applicants");
                 String inventors = csvRecord.get("Inventors");
 
-                applicantsList.add(applicants);
-                inventorsList.add(inventors);
+                // Filtrera rader baserat på söktermen (searchTerm)
+                if (searchTerm == null || searchTerm.isEmpty() || applicants.toLowerCase().contains(searchTerm.toLowerCase()) || inventors.toLowerCase().contains(searchTerm.toLowerCase())) {
+                    applicantsList.add(applicants);
+                    inventorsList.add(inventors);
+                }
             }
 
         } catch (IOException e) {
