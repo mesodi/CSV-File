@@ -54,6 +54,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-csv</artifactId>
+		</dependency>
+
+
 		<!-- Reactor Test -->
 		<dependency>
 			<groupId>io.projectreactor</groupId>

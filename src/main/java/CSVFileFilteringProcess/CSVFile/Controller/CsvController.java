@@ -3,11 +3,16 @@ package CSVFileFilteringProcess.CSVFile.Controller;
 import CSV.CsvView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +70,10 @@ public class CsvController {
                         }
                     }
                     html.append("</table>");
+
+                    // Lägg till länk för att ladda ner JSON-filen
+                    String jsonFileName = csvFile.getName().replace(".csv", ".json");
+                    html.append("<a href=\"/download-json/").append(jsonFileName).append("\">Download JSON</a>");
                 }
             }
         } else {
@@ -73,5 +82,34 @@ public class CsvController {
 
         html.append("</body></html>");
         return html.toString();
+    }
+
+    @GetMapping("/download-json/{fileName}")
+    public ResponseEntity<byte[]> downloadJson(@PathVariable String fileName) {
+        // Bygg sökvägen till JSON-filen
+        String jsonFilePath = "src/main/resources/uploads/" + fileName + ".json";
+        File jsonFile = new File(jsonFilePath);
+
+        if (jsonFile.exists()) {
+            try {
+                // Läs JSON-filen som en byte-array
+                byte[] jsonBytes = Files.readAllBytes(jsonFile.toPath());
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setContentDispositionFormData("attachment", fileName + ".json");
+                headers.setContentLength(jsonBytes.length);
+
+                // Returnera JSON-filen som en ResponseEntity
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(jsonBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Om filen inte hittades, returnera ett felmeddelande
+        return ResponseEntity.notFound().build();
     }
 }
